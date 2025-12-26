@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR Video v2.0</title>
+    <title>AR Video v2.1</title>
 
     <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe-master.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
@@ -12,14 +12,13 @@
         window.addEventListener('load', () => {
             const video = document.querySelector('#vid');
 
-            // 1. Play video when marker is found
             AFRAME.registerComponent('videohandler', {
                 init: function () {
                     const marker = this.el;
 
                     marker.addEventListener('markerFound', () => {
                         console.log('✅ Marker Found');
-                        video.play(); // Play immediately (muted)
+                        video.play();
                     });
 
                     marker.addEventListener('markerLost', () => {
@@ -29,18 +28,14 @@
                 }
             });
 
-            // 2. Allow user to click anywhere to UNMUTE sound
             window.addEventListener('click', () => {
                 if(video.muted) {
-                    console.log('🔊 Unmuting video...');
-                    video.muted = false; // Turn sound on
-                    // Visual feedback that sound is on
+                    video.muted = false;
                     document.getElementById('version-label').innerText = "🔊 Sound ON";
                     document.getElementById('version-label').style.color = "#00ff00";
                 }
             });
 
-            // 3. Remove loading screen
             const scene = document.querySelector('a-scene');
             scene.addEventListener('loaded', () => {
                 document.querySelector('.loader').style.display = 'none';
@@ -55,35 +50,21 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             color: white; font-family: sans-serif; text-align: center;
         }
-        .instructions {
-            margin-top: 20px; font-size: 1.2em; color: #ffff00;
-        }
-        /* New Version Label Style */
         #version-label {
-            position: fixed;
-            bottom: 10px;
-            left: 10px;
-            color: yellow;
-            font-family: monospace;
-            font-size: 16px;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 5px;
-            z-index: 10000;
-            pointer-events: none; /* Let clicks pass through */
+            position: fixed; bottom: 10px; left: 10px;
+            color: cyan; font-family: monospace; font-size: 16px;
+            background: rgba(0, 0, 0, 0.5); padding: 5px; z-index: 10000;
         }
     </style>
 </head>
 
 <body style="margin: 0; overflow: hidden;">
 
-    <div id="version-label">v2.0: Centered + Autoplay</div>
+    <div id="version-label">v2.1: Safe Mode (Lifted)</div>
 
     <div class="loader">
-        <div>Loading AR Experience...</div>
-        <div class="instructions">
-            Scan your image.<br>
-            Tap screen to enable sound!
-        </div>
+        <div>Loading...</div>
+        <div>Tap screen for sound</div>
     </div>
 
     <a-scene
@@ -107,10 +88,11 @@
             
             <a-video 
                 src="#vid" 
-                position="0 0 0" 
-                rotation="-90 0 0" 
+                position="100 0 -150" 
+                rotation="90 0 180" 
                 width="300" 
-                height="200">
+                height="220"
+                material="side: double;">
             </a-video>
         </a-nft>
 
