@@ -4,60 +4,12 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR.js NFT Video</title>
+    <title>AR.js Universal Test</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/aframe@1.6.0/dist/aframe-master.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe-master.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
-    <script>
-        window.addEventListener('load', () => {
-            const video = document.querySelector('#vid');
-
-            // User interaction to unlock audio on iOS/Android
-            window.addEventListener('click', () => {
-                if (video.paused) {
-                    video.play();
-                    video.pause();
-                }
-            }, { once: true });
-
-            AFRAME.registerComponent('videohandler', {
-                init: function () {
-                    const marker = this.el;
-
-                    marker.addEventListener('markerFound', () => {
-                        console.log('🎯 Marker found');
-                        video.muted = false;
-                        video.play().catch(e => {
-                            console.warn('Autoplay blocked:', e);
-                        });
-                    });
-
-                    marker.addEventListener('markerLost', () => {
-                        console.log('❌ Marker lost');
-                        video.pause();
-                        video.currentTime = 0;
-                    });
-                }
-            });
-
-            // Hide loader when scene is ready
-            const scene = document.querySelector('a-scene');
-            scene.addEventListener('loaded', () => {
-                const loader = document.querySelector('.arjs-loader');
-                if (loader) {
-                    loader.style.display = 'none';
-                }
-            });
-        });
-    </script>
-
     <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-        }
-
         .arjs-loader {
             height: 100%;
             width: 100%;
@@ -75,29 +27,26 @@
             text-align: center;
             font-size: 1.25em;
             color: white;
-            font-family: sans-serif;
         }
     </style>
 </head>
 
-<body>
+<body style="margin : 0px; overflow: hidden;">
     <div class="arjs-loader">
-        <div>Loading AR...<br>Once loaded, point camera at image!</div>
+        <div>Loading T-Rex Marker...<br>Please wait...</div>
     </div>
 
-    <a-scene vr-mode-ui="enabled: false;" renderer="logarithmicDepthBuffer: true; precision: medium;" embedded
+    <a-scene vr-mode-ui="enabled: false;" renderer="logarithmicDepthBuffer: true;" embedded
         arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
 
-        <a-assets>
-            <video id="vid" src="./mov_bbb.mp4" preload="auto" loop playsinline webkit-playsinline
-                crossorigin="anonymous"></video>
-        </a-assets>
+        <a-nft type="nft"
+            url="https://raw.githack.com/AR-js-org/AR.js/master/aframe/examples/image-tracking/nft/trex/trex-image/trex"
+            smooth="true" smoothCount="10" smoothTolerance="0.01" smoothThreshold="5">
 
-        <a-nft videohandler type="nft" url="https://Kav1nduAkalanka.github.io/AR_website/assests/nft" smooth="true"
-            smoothCount="10" smoothTolerance="0.01" smoothThreshold="5">
+            <a-box position="50 150 -100" scale="150 150 150" color="red"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 2000">
+            </a-box>
 
-            <a-video src="#vid" position="50 150 -100" rotation="90 0 180" width="150" height="100">
-            </a-video>
         </a-nft>
 
         <a-entity camera></a-entity>
