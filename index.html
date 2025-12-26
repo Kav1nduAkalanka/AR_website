@@ -3,54 +3,51 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AR Dashboard HUD</title>
+    <title>AR Dashboard Final</title>
 
     <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe-master.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
     <style>
-        /* 1. HUD CONTAINER: Fixed to bottom of screen */
+        /* 1. HUD CONTAINER (The buttons at the bottom) */
         #hud {
             position: fixed; 
-            bottom: 20px; 
+            bottom: 30px; 
             left: 0; 
             width: 100%; 
             display: flex; 
             justify-content: center; 
-            gap: 20px; /* Space between buttons */
-            z-index: 1000; /* On top of everything */
+            gap: 15px; 
+            z-index: 1000; 
             display: none; /* Hidden until marker is found */
         }
 
-        /* 2. THE BUTTONS: Standard HTML buttons (100% clickable) */
+        /* 2. BUTTON STYLING */
         .hud-btn {
             width: 60px;
             height: 60px;
-            border-radius: 50%; /* Circle */
+            border-radius: 50%;
             background-color: white;
             border: 3px solid #e91e63;
             box-shadow: 0px 5px 15px rgba(0,0,0,0.5);
             cursor: pointer;
+            background-size: cover;
             transition: transform 0.1s;
-            background-size: cover; /* Fit icon inside */
         }
 
-        .hud-btn:active {
-            transform: scale(0.9); /* Press effect */
-            background-color: #ddd;
-        }
+        .hud-btn:active { transform: scale(0.9); }
 
         /* 3. LOADING SCREEN */
         #loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); color: white;
+            background: rgba(0,0,0,0.85); color: white;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 9999;
         }
     </style>
 
     <script>
-        // SLIDESHOW LOGIC (Still needed for the AR part)
+        // SLIDESHOW LOGIC
         AFRAME.registerComponent('slideshow', {
             init: function() {
                 const el = this.el;
@@ -67,7 +64,7 @@
             }
         });
 
-        // MARKER LOGIC: Show/Hide HUD buttons
+        // MARKER LOGIC (Shows HUD when marker is found)
         AFRAME.registerComponent('markerhandler', {
             init: function () {
                 const loader = document.getElementById('loader');
@@ -76,20 +73,20 @@
                 this.el.addEventListener('markerFound', () => {
                     console.log("✅ Marker Found");
                     loader.style.display = 'none'; // Hide Loader
-                    hud.style.display = 'flex';    // SHOW BUTTONS
+                    hud.style.display = 'flex';    // Show Buttons
                 });
 
                 this.el.addEventListener('markerLost', () => {
                     console.log("❌ Marker Lost");
-                    hud.style.display = 'none';    // Hide Buttons if marker lost
+                    hud.style.display = 'none';    // Hide Buttons
                 });
             }
         });
 
-        // CLICK FUNCTIONS (Called by the HTML buttons)
+        // LINK LOGIC
         function openLink(url) {
-            alert("Opening: " + url);
-            // window.open(url, '_blank'); // Uncomment for real links
+            // alert("Opening: " + url); // Debugging
+             window.open(url, '_blank'); // Real Link
         }
     </script>
 </head>
@@ -97,21 +94,21 @@
 <body style="margin: 0; overflow: hidden;">
 
     <div id="loader">
-        <div>Loading Dashboard...</div>
+        <div>Loading Experience...</div>
         <div style="font-size: 12px; margin-top: 10px;">Point camera at image</div>
     </div>
 
     <div id="hud">
-        <button class="hud-btn" onclick="openLink('Facebook')" 
+        <button class="hud-btn" onclick="openLink('https://facebook.com')" 
                 style="background-image: url('https://placehold.co/60x60/3b5998/white?text=FB');"></button>
         
-        <button class="hud-btn" onclick="openLink('LinkedIn')" 
+        <button class="hud-btn" onclick="openLink('https://linkedin.com')" 
                 style="background-image: url('https://placehold.co/60x60/0077b5/white?text=LI');"></button>
         
-        <button class="hud-btn" onclick="openLink('GitHub')" 
+        <button class="hud-btn" onclick="openLink('https://github.com')" 
                 style="background-image: url('https://placehold.co/60x60/333/white?text=GH');"></button>
         
-        <button class="hud-btn" onclick="openLink('Website')" 
+        <button class="hud-btn" onclick="openLink('https://google.com')" 
                 style="background-image: url('https://placehold.co/60x60/e91e63/white?text=WEB');"></button>
     </div>
 
@@ -132,7 +129,7 @@
 
             <a-box 
                 color="blue"
-                position="-100 0 -150"
+                position="-100 0 -350"
                 scale="50 50 50"
                 animation="property: rotation; to: 0 360 0; loop: true; dur: 4000">
             </a-box>
@@ -141,11 +138,11 @@
                 slideshow
                 src="https://placehold.co/400x300/orange/white?text=Loading..."
                 width="150" height="100"
-                position="150 0 -150"
+                position="150 0 -350"
                 rotation="-90 0 0">
             </a-image>
 
-            </a-nft>
+        </a-nft>
 
         <a-entity camera></a-entity>
     </a-scene>
