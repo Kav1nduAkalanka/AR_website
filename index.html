@@ -3,13 +3,13 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR Video Experience</title>
+    <title>AR Video Final</title>
 
     <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe-master.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
     <style>
-        /* Splash screen to force user interaction */
+        /* The "Click to Start" Screen */
         #splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: black; z-index: 99999;
@@ -27,30 +27,32 @@
             const splash = document.querySelector('#splash-screen');
             const button = document.querySelector('#start-button');
 
-            // 1. Force the video to "unlock" on user click
+            // 1. Force the video to download and "unlock" on click
             button.addEventListener('click', () => {
                 video.muted = true; // Start muted
                 video.play().then(() => {
-                    console.log("✅ Video unlocked");
+                    console.log("✅ Cloud Video Unlocked");
                     video.pause();       // Pause immediately
-                    video.currentTime = 0; // Reset to start
+                    video.currentTime = 0; // Rewind
                     splash.style.display = 'none'; // Hide button
                 }).catch(e => {
-                    alert("Error: " + e.message);
+                    alert("Error loading video: " + e.message);
                 });
             });
 
-            // 2. AR Logic: Play when marker is found
+            // 2. AR Logic
             AFRAME.registerComponent('videohandler', {
                 init: function () {
                     const marker = this.el;
 
                     marker.addEventListener('markerFound', () => {
+                        console.log("✅ Marker Found!");
                         video.muted = false; // Turn sound ON
                         video.play();
                     });
 
                     marker.addEventListener('markerLost', () => {
+                        console.log("❌ Marker Lost");
                         video.pause();
                     });
                 }
@@ -74,7 +76,7 @@
         <a-assets>
             <video 
                 id="vid" 
-                src="./mov_bbb.mp4" 
+                src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" 
                 preload="auto" 
                 loop 
                 crossorigin="anonymous" 
