@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR Search Mode</title>
+    <title>AR Video Final</title>
 
     <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe-master.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
@@ -11,55 +11,60 @@
     <script>
         window.addEventListener('load', () => {
             const video = document.querySelector('#vid');
+            const startBtn = document.querySelector('.start-btn');
+
+            // 1. Force user interaction to unlock video
+            startBtn.addEventListener('click', () => {
+                // Try to play and immediately pause to "unlock" the video capability
+                video.play().then(() => {
+                    video.pause();
+                    video.currentTime = 0;
+                    startBtn.style.display = 'none'; // Hide button after click
+                }).catch(e => console.error("Video unlock failed", e));
+            });
 
             AFRAME.registerComponent('videohandler', {
                 init: function () {
                     const marker = this.el;
+
                     marker.addEventListener('markerFound', () => {
-                        console.log('✅ Found');
-                        video.play();
+                        console.log('✅ Marker Found');
+                        if (video.paused) {
+                            video.muted = false; // Turn on sound
+                            video.play();
+                        }
                     });
+
                     marker.addEventListener('markerLost', () => {
-                        console.log('❌ Lost');
+                        console.log('❌ Marker Lost');
                         video.pause();
                     });
                 }
-            });
-
-            window.addEventListener('click', () => {
-                video.muted = false;
-                document.getElementById('debug-label').innerText = "🔊 Sound ON";
-                document.getElementById('debug-label').style.color = "#00ff00";
-            });
-
-            const scene = document.querySelector('a-scene');
-            scene.addEventListener('loaded', () => {
-                document.querySelector('.loader').style.display = 'none';
             });
         });
     </script>
 
     <style>
-        .loader {
+        /* A big button to force video permission */
+        .start-btn {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            color: white; font-family: sans-serif; text-align: center;
+            color: white; font-family: sans-serif; cursor: pointer;
         }
-        #debug-label {
-            position: fixed; bottom: 20px; left: 20px;
-            color: orange; font-family: monospace; font-size: 20px;
-            background: rgba(0,0,0,0.5); padding: 10px; z-index: 10000;
+        .btn-box {
+            border: 2px solid white; padding: 20px; border-radius: 10px; background: rgba(255, 0, 0, 0.5);
         }
     </style>
 </head>
 
 <body style="margin: 0; overflow: hidden;">
 
-    <div id="debug-label">v5.0: Search Mode (Spinning)</div>
-
-    <div class="loader">
-        <div>Loading...</div>
+    <div class="start-btn">
+        <div class="btn-box">
+            <h1>TAP TO START</h1>
+            <p>(Required for Video)</p>
+        </div>
     </div>
 
     <a-scene
@@ -81,22 +86,13 @@
             smoothTolerance="0.01"
             smoothThreshold="5">
             
-            <a-box 
-                position="0 0 0" 
-                scale="50 50 50" 
-                color="red" 
-                material="opacity: 0.5;">
-            </a-box>
-
             <a-video 
                 src="#vid" 
-                position="0 50 0" 
-                width="200" 
-                height="150"
-                material="side: double;"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 5000">
+                position="50 0 -50"
+                rotation="-90 0 90"
+                width="250" 
+                height="180">
             </a-video>
-
         </a-nft>
 
         <a-entity camera></a-entity>
