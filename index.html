@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR Video Final</title>
+    <title>AR Video v2.0</title>
 
     <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe-master.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
@@ -34,6 +34,9 @@
                 if(video.muted) {
                     console.log('🔊 Unmuting video...');
                     video.muted = false; // Turn sound on
+                    // Visual feedback that sound is on
+                    document.getElementById('version-label').innerText = "🔊 Sound ON";
+                    document.getElementById('version-label').style.color = "#00ff00";
                 }
             });
 
@@ -55,10 +58,25 @@
         .instructions {
             margin-top: 20px; font-size: 1.2em; color: #ffff00;
         }
+        /* New Version Label Style */
+        #version-label {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            color: yellow;
+            font-family: monospace;
+            font-size: 16px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px;
+            z-index: 10000;
+            pointer-events: none; /* Let clicks pass through */
+        }
     </style>
 </head>
 
 <body style="margin: 0; overflow: hidden;">
+
+    <div id="version-label">v2.0: Centered + Autoplay</div>
 
     <div class="loader">
         <div>Loading AR Experience...</div>
