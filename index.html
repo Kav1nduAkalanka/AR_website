@@ -3,13 +3,20 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AR Dashboard Final Fix</title>
+    <title>AR Dashboard Stable</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe-master.min.js"></script>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
+    <style>
+        /* CHANGE 2: Ensure loader allows clicks to pass through */
+        #loader {
+            pointer-events: none; 
+        }
+    </style>
+
     <script>
-        // 1. SLIDESHOW
+        // Slideshow Logic
         AFRAME.registerComponent('slideshow', {
             init: function() {
                 const el = this.el;
@@ -26,36 +33,34 @@
             }
         });
 
-        // 2. SOCIAL LINK HANDLER
+        // Click Logic
         AFRAME.registerComponent('social-link', {
             schema: { url: {type: 'string'} },
             init: function() {
-                const openLink = () => {
-                    this.el.setAttribute('color', 'red'); 
-                    setTimeout(() => this.el.setAttribute('color', 'white'), 200);
+                this.el.addEventListener('click', () => {
+                    // Visual feedback: flash red
+                    this.el.setAttribute('material', 'color', 'red'); 
+                    setTimeout(() => {
+                        this.el.setAttribute('material', 'color', 'white');
+                    }, 200);
+
+                    // Open link
                     alert("Opening: " + this.data.url);
-                };
-                
-                this.el.addEventListener('click', openLink);
-                // "touchstart" is the backup for stubborn phones
-                this.el.addEventListener('touchstart', (e) => {
-                    e.preventDefault(); 
-                    openLink();
+                    // window.open(this.data.url, '_blank'); 
                 });
             }
         });
 
-        // 3. MARKER HANDLER
+        // Marker Handler
         AFRAME.registerComponent('markerhandler', {
             init: function () {
                 const loader = document.getElementById('loader');
                 this.el.addEventListener('markerFound', () => {
-                    console.log("✅ Marker Found");
-                    loader.style.zIndex = "-1"; 
                     loader.style.opacity = "0";
                 });
                 this.el.addEventListener('markerLost', () => {
-                    console.log("❌ Marker Lost");
+                    // Optional: Show loader again if marker is lost
+                    // loader.style.opacity = "1";
                 });
             }
         });
@@ -64,17 +69,18 @@
 
 <body style="margin: 0; overflow: hidden;">
 
-    <div id="loader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s;">
-        <div>Loading Dashboard...</div>
-        <div style="font-size: 12px; margin-top: 10px;">Point camera at image</div>
+    <div id="loader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s;">
+        <div>Loading...</div>
     </div>
 
     <a-scene
         vr-mode-ui="enabled: false;"
         renderer="logarithmicDepthBuffer: true;"
         embedded
-        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
-        
+        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
+        cursor="rayOrigin: mouse"
+        raycaster="objects: .clickable">
+
         <a-nft
             markerhandler
             type="nft"
@@ -100,24 +106,24 @@
             </a-image>
 
             <a-entity position="-120 1 0" rotation="-90 0 0">
-                <a-plane class="clickable" social-link="url: Facebook" color="white" opacity="0.9" src="https://placehold.co/100x100/3b5998/white?text=FB" width="60" height="60"></a-plane>
+                <a-plane class="clickable" social-link="url: Facebook" color="white" opacity="0.9" src="https://placehold.co/100x100/3b5998/white?text=FB" width="80" height="80"></a-plane>
             </a-entity>
 
             <a-entity position="-40 1 0" rotation="-90 0 0">
-                <a-plane class="clickable" social-link="url: LinkedIn" color="white" opacity="0.9" src="https://placehold.co/100x100/0077b5/white?text=LI" width="60" height="60"></a-plane>
+                <a-plane class="clickable" social-link="url: LinkedIn" color="white" opacity="0.9" src="https://placehold.co/100x100/0077b5/white?text=LI" width="80" height="80"></a-plane>
             </a-entity>
 
             <a-entity position="40 1 0" rotation="-90 0 0">
-                <a-plane class="clickable" social-link="url: GitHub" color="white" opacity="0.9" src="https://placehold.co/100x100/333/white?text=GH" width="60" height="60"></a-plane>
+                <a-plane class="clickable" social-link="url: GitHub" color="white" opacity="0.9" src="https://placehold.co/100x100/333/white?text=GH" width="80" height="80"></a-plane>
             </a-entity>
 
             <a-entity position="120 1 0" rotation="-90 0 0">
-                <a-plane class="clickable" social-link="url: Website" color="white" opacity="0.9" src="https://placehold.co/100x100/e91e63/white?text=WEB" width="60" height="60"></a-plane>
+                <a-plane class="clickable" social-link="url: Website" color="white" opacity="0.9" src="https://placehold.co/100x100/e91e63/white?text=WEB" width="80" height="80"></a-plane>
             </a-entity>
 
         </a-nft>
 
-        <a-entity camera cursor="fuse: false; rayOrigin: mouse;" raycaster="objects: .clickable"></a-entity>
+        <a-entity camera></a-entity>
 
     </a-scene>
 </body>
