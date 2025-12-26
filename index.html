@@ -9,18 +9,16 @@
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
     <style>
-        /* 1. Splash Screen Styling */
         #splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.9); z-index: 99999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
         
-        /* 2. Button Styling (Starts Red/Loading) */
         #start-button {
-            padding: 15px 30px; 
-            font-size: 18px; 
-            background: #ff4444; /* Red = Loading */
+            padding: 15px 40px; 
+            font-size: 20px; 
+            background: #e91e63; 
             color: white; 
             border: none; 
             border-radius: 50px; 
@@ -28,16 +26,10 @@
             font-weight: bold;
             box-shadow: 0px 4px 15px rgba(0,0,0,0.5);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: background 0.3s;
-        }
-        
-        #start-button:disabled {
-            opacity: 0.7; cursor: wait;
         }
 
         .instructions {
-            color: #ddd; margin-top: 20px; font-family: sans-serif; text-align: center; line-height: 1.5;
+            color: #ddd; margin-top: 20px; font-family: sans-serif; text-align: center;
         }
     </style>
 
@@ -46,49 +38,37 @@
             const video = document.querySelector('#vid');
             const splash = document.querySelector('#splash-screen');
             const button = document.querySelector('#start-button');
-            const instructions = document.querySelector('.instructions');
 
-            // --- LOADING LOGIC ---
-            // 1. Initially disable button
-            button.innerText = "LOADING VIDEO...";
-            
-            // 2. Wait for video to be ready (buffered)
-            video.addEventListener('canplaythrough', () => {
-                button.style.background = "#00c851"; // Green = Ready
-                button.innerText = "TAP TO START";
-                instructions.innerText = "Video Loaded! \n Tap above, then point camera at image.";
-            });
-
-            // Fallback: If 'canplaythrough' doesn't fire quickly (cached), force it after 3s
-            setTimeout(() => {
-                if(button.innerText.includes("LOADING")) {
-                    button.style.background = "#ffbb33"; // Orange = Forced Ready
-                    button.innerText = "TAP TO START";
-                }
-            }, 5000);
-
-
-            // --- START LOGIC ---
+            // 1. CLICK TO UNLOCK (Essential)
             button.addEventListener('click', () => {
-                video.muted = true; // Start muted to satisfy browser security
-                
-                // Play and immediately pause to "unlock" the video engine
+                // We play it MUTED first to ensure the browser allows it
+                video.muted = true; 
                 video.play().then(() => {
                     video.pause();         
                     video.currentTime = 0; 
-                    splash.style.display = 'none'; // Hide splash screen
+                    splash.style.display = 'none'; // Hide splash
                 }).catch(e => {
                     alert("Error unlocking video: " + e.message);
                 });
             });
 
-            // --- AR TRACKING LOGIC ---
+            // 2. AR MARKER LOGIC
             AFRAME.registerComponent('videohandler', {
                 init: function () {
                     this.el.addEventListener('markerFound', () => {
-                        video.muted = false; // Unmute sound
-                        video.play();
+                        console.log("Marker Found - Attempting play");
+                        
+                        // FAILSAFE: Always start MUTED first. 
+                        // This guarantees the video will move.
+                        video.muted = true;
+                        video.play().then(() => {
+                            // If playing successfully, TRY to unmute
+                            video.muted = false;
+                        }).catch(e => {
+                            console.log("Autoplay blocked, keeping muted.");
+                        });
                     });
+
                     this.el.addEventListener('markerLost', () => {
                         video.pause();
                     });
@@ -101,8 +81,8 @@
 <body style="margin: 0; overflow: hidden;">
 
     <div id="splash-screen">
-        <button id="start-button">Initializing...</button>
-        <div class="instructions">Please wait while the AR loads...</div>
+        <button id="start-button">TAP TO START</button>
+        <div class="instructions">If video is silent, tap screen to unmute.</div>
     </div>
 
     <a-scene
