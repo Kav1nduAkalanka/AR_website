@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR Dashboard Test</title>
+    <title>AR Dashboard Fix</title>
 
     <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe-master.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
@@ -22,7 +22,7 @@
                 setInterval(() => {
                     index = (index + 1) % images.length;
                     el.setAttribute('src', images[index]);
-                }, 2000); // Change every 2 seconds
+                }, 2000); 
             }
         });
 
@@ -31,18 +31,35 @@
             schema: { url: {type: 'string'} },
             init: function() {
                 this.el.addEventListener('click', () => {
-                    alert("Opening: " + this.data.url); // Alert for testing
-                    // window.open(this.data.url, '_blank'); // Uncomment this for real use
+                    alert("Opening: " + this.data.url); 
                 });
             }
+        });
+
+        // 3. MAIN LOGIC (Hide Loader)
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loader');
+
+            AFRAME.registerComponent('markerhandler', {
+                init: function () {
+                    this.el.addEventListener('markerFound', () => {
+                        console.log("✅ Marker Found");
+                        loader.style.display = 'none'; // HIDE LOADING SCREEN
+                    });
+                    this.el.addEventListener('markerLost', () => {
+                        console.log("❌ Marker Lost");
+                    });
+                }
+            });
         });
     </script>
 </head>
 
 <body style="margin: 0; overflow: hidden;">
 
-    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); color: white; display: flex; justify-content: center; align-items: center; z-index: 999;">
-        <div>Loading Placeholders...<br>Scan your image!</div>
+    <div id="loader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 999;">
+        <div>Loading...</div>
+        <div style="font-size: 12px; margin-top: 10px;">Point camera at image</div>
     </div>
 
     <a-scene
@@ -54,6 +71,7 @@
         raycaster="objects: .clickable">
 
         <a-nft
+            markerhandler
             type="nft"
             url="https://Kav1nduAkalanka.github.io/AR_website/assests/nft"
             smooth="true"
@@ -76,12 +94,20 @@
                 rotation="-90 0 0">
             </a-image>
 
+            <a-plane 
+                color="red" 
+                opacity="0.5" 
+                width="350" height="60" 
+                position="0 -1 80" 
+                rotation="-90 0 0">
+            </a-plane>
+
             <a-image 
                 src="https://placehold.co/100x100/3b5998/white?text=FB"
                 class="clickable"
                 social-link="url: Facebook"
                 width="40" height="40"
-                position="-120 0 150"
+                position="-120 0 80"
                 rotation="-90 0 0">
             </a-image>
 
@@ -90,7 +116,7 @@
                 class="clickable"
                 social-link="url: LinkedIn"
                 width="40" height="40"
-                position="-40 0 150"
+                position="-40 0 80"
                 rotation="-90 0 0">
             </a-image>
 
@@ -99,7 +125,7 @@
                 class="clickable"
                 social-link="url: GitHub"
                 width="40" height="40"
-                position="40 0 150"
+                position="40 0 80"
                 rotation="-90 0 0">
             </a-image>
 
@@ -108,7 +134,7 @@
                 class="clickable"
                 social-link="url: Website"
                 width="40" height="40"
-                position="120 0 150"
+                position="120 0 80"
                 rotation="-90 0 0">
             </a-image>
 
