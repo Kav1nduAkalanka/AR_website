@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AR Dashboard Click Fix</title>
+    <title>AR Dashboard Final Fix</title>
 
     <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe-master.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
@@ -26,36 +26,31 @@
             }
         });
 
-        // 2. SUPER CLICKER (Handles Touch AND Click)
+        // 2. SOCIAL LINK HANDLER
         AFRAME.registerComponent('social-link', {
             schema: { url: {type: 'string'} },
             init: function() {
-                // Function to handle opening the link
                 const openLink = () => {
-                    // Visual feedback: briefly turn red
                     this.el.setAttribute('color', 'red'); 
                     setTimeout(() => this.el.setAttribute('color', 'white'), 200);
-                    
                     alert("Opening: " + this.data.url);
-                    // window.open(this.data.url, '_blank'); 
                 };
-
-                // Listen for BOTH Mouse Click and Finger Touch
+                
                 this.el.addEventListener('click', openLink);
+                // "touchstart" is the backup for stubborn phones
                 this.el.addEventListener('touchstart', (e) => {
-                    e.preventDefault(); // Prevent double-firing
+                    e.preventDefault(); 
                     openLink();
                 });
             }
         });
 
-        // 3. MARKER HANDLER (Fixes the "Blocked Screen" issue)
+        // 3. MARKER HANDLER
         AFRAME.registerComponent('markerhandler', {
             init: function () {
                 const loader = document.getElementById('loader');
                 this.el.addEventListener('markerFound', () => {
                     console.log("✅ Marker Found");
-                    // Send loader to the back so it can't block clicks
                     loader.style.zIndex = "-1"; 
                     loader.style.opacity = "0";
                 });
@@ -78,10 +73,8 @@
         vr-mode-ui="enabled: false;"
         renderer="logarithmicDepthBuffer: true;"
         embedded
-        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
-        cursor="rayOrigin: mouse; fuse: false" 
-        raycaster="objects: .clickable">
-
+        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
+        
         <a-nft
             markerhandler
             type="nft"
@@ -107,47 +100,25 @@
             </a-image>
 
             <a-entity position="-120 1 0" rotation="-90 0 0">
-                <a-plane 
-                    class="clickable"
-                    social-link="url: Facebook"
-                    color="white" opacity="0.9"
-                    src="https://placehold.co/100x100/3b5998/white?text=FB"
-                    width="60" height="60"> </a-plane>
+                <a-plane class="clickable" social-link="url: Facebook" color="white" opacity="0.9" src="https://placehold.co/100x100/3b5998/white?text=FB" width="60" height="60"></a-plane>
             </a-entity>
 
             <a-entity position="-40 1 0" rotation="-90 0 0">
-                <a-plane 
-                    class="clickable"
-                    social-link="url: LinkedIn"
-                    color="white" opacity="0.9"
-                    src="https://placehold.co/100x100/0077b5/white?text=LI"
-                    width="60" height="60">
-                </a-plane>
+                <a-plane class="clickable" social-link="url: LinkedIn" color="white" opacity="0.9" src="https://placehold.co/100x100/0077b5/white?text=LI" width="60" height="60"></a-plane>
             </a-entity>
 
             <a-entity position="40 1 0" rotation="-90 0 0">
-                <a-plane 
-                    class="clickable"
-                    social-link="url: GitHub"
-                    color="white" opacity="0.9"
-                    src="https://placehold.co/100x100/333/white?text=GH"
-                    width="60" height="60">
-                </a-plane>
+                <a-plane class="clickable" social-link="url: GitHub" color="white" opacity="0.9" src="https://placehold.co/100x100/333/white?text=GH" width="60" height="60"></a-plane>
             </a-entity>
 
             <a-entity position="120 1 0" rotation="-90 0 0">
-                <a-plane 
-                    class="clickable"
-                    social-link="url: Website"
-                    color="white" opacity="0.9"
-                    src="https://placehold.co/100x100/e91e63/white?text=WEB"
-                    width="60" height="60">
-                </a-plane>
+                <a-plane class="clickable" social-link="url: Website" color="white" opacity="0.9" src="https://placehold.co/100x100/e91e63/white?text=WEB" width="60" height="60"></a-plane>
             </a-entity>
 
         </a-nft>
 
-        <a-entity camera></a-entity>
+        <a-entity camera cursor="fuse: false; rayOrigin: mouse;" raycaster="objects: .clickable"></a-entity>
+
     </a-scene>
 </body>
 </html>
