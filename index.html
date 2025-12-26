@@ -3,91 +3,72 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR Debug Mode</title>
+    <title>AR Video Final Fix</title>
 
     <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe-master.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
+    <style>
+        /* Force a black screen with a button initially */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; z-index: 99999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        #start-button {
+            padding: 20px 40px; font-size: 24px; background: #00ff00; color: black;
+            border: none; border-radius: 10px; cursor: pointer; font-weight: bold;
+        }
+    </style>
+
     <script>
         window.addEventListener('load', () => {
             const video = document.querySelector('#vid');
-            const debugText = document.querySelector('#debug-text');
+            const splash = document.querySelector('#splash-screen');
+            const button = document.querySelector('#start-button');
 
-            // Helper function to update screen text
-            function updateDebug(text) {
-                console.log(text);
-                debugText.innerText = "Status: " + text;
-            }
-
-            // 1. GLOBAL UNLOCK: User must tap screen once to enable video engine
-            window.addEventListener('click', () => {
-                if(video.paused && video.currentTime === 0) {
-                    updateDebug("User Tapped. Initializing Video...");
-                    video.play().then(() => {
-                        video.pause();
-                        updateDebug("Video Engine Unlocked. Scan Marker Now.");
-                    }).catch(e => {
-                        updateDebug("Error Unlocking: " + e.message);
-                    });
-                } else {
-                    // If video is already running, this click toggles sound
-                    if(video.muted) {
-                        video.muted = false;
-                        updateDebug("Sound UNMUTED 🔊");
-                    }
-                }
+            // 1. THE NUCLEAR FIX: 
+            // We force the user to click this button. This gives the browser 
+            // absolute permission to play the video.
+            button.addEventListener('click', () => {
+                // Play the video immediately (even if marker isn't there yet)
+                video.muted = true; // Start muted (safest)
+                video.play().then(() => {
+                    console.log("✅ Video Engine Unlocked!");
+                    video.pause(); // Pause it and wait for marker
+                    video.currentTime = 0; // Rewind
+                    splash.style.display = 'none'; // Hide the black screen
+                }).catch(e => {
+                    alert("Error unlocking video: " + e.message);
+                });
             });
 
-            // 2. MARKER EVENTS
+            // 2. AR Logic
             AFRAME.registerComponent('videohandler', {
                 init: function () {
                     const marker = this.el;
 
                     marker.addEventListener('markerFound', () => {
-                        updateDebug("✅ Marker Detect! Attempting Play...");
-                        
-                        // IMPORTANT: We play MUTED first to satisfy browser security
-                        video.muted = true; 
-                        
-                        var promise = video.play();
-                        if (promise !== undefined) {
-                            promise.then(_ => {
-                                updateDebug("▶️ Playing (Muted). Tap for Sound.");
-                            }).catch(error => {
-                                updateDebug("❌ Blocked: " + error.message);
-                            });
-                        }
+                        console.log('✅ Marker Found - PLAYING');
+                        video.muted = false; // Try to unmute
+                        video.play();
                     });
 
                     marker.addEventListener('markerLost', () => {
-                        updateDebug("⚠️ Marker Lost. Pausing.");
+                        console.log('❌ Marker Lost - PAUSING');
                         video.pause();
                     });
                 }
             });
         });
     </script>
-
-    <style>
-        /* Debug Box Styles */
-        #debug-box {
-            position: fixed; top: 10px; left: 10px; z-index: 9999;
-            background: rgba(0, 0, 0, 0.7); padding: 10px; border-radius: 5px;
-        }
-        #debug-text {
-            color: #00ff00; font-family: monospace; font-size: 16px; font-weight: bold;
-        }
-        .instructions {
-            color: white; font-family: sans-serif; font-size: 12px; margin-top: 5px;
-        }
-    </style>
 </head>
 
 <body style="margin: 0; overflow: hidden;">
 
-    <div id="debug-box">
-        <div id="debug-text">Status: Waiting for Load...</div>
-        <div class="instructions">1. Tap screen once to start.<br>2. Point at brochure.</div>
+    <div id="splash-screen">
+        <button id="start-button">CLICK TO START AR</button>
+        <p style="color: white; margin-top: 20px;">(This click unlocks the video)</p>
     </div>
 
     <a-scene
@@ -97,7 +78,15 @@
         arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
 
         <a-assets>
-            <video id="vid" src="./mov_bbb.mp4" preload="auto" loop muted playsinline webkit-playsinline crossorigin="anonymous"></video>
+            <video 
+                id="vid" 
+                src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" 
+                preload="auto" 
+                loop 
+                crossorigin="anonymous" 
+                playsinline 
+                webkit-playsinline>
+            </video>
         </a-assets>
 
         <a-nft
@@ -114,7 +103,8 @@
                 position="50 0 -50"
                 rotation="-90 0 90"
                 width="250" 
-                height="180">
+                height="180"
+                material="color: red;"> 
             </a-video>
         </a-nft>
 
