@@ -3,121 +3,115 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>AR Experience</title>
+    <title>AR Dashboard Test</title>
 
     <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe-master.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
-    <style>
-        #splash-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9); z-index: 99999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-        }
-        
-        #start-button {
-            padding: 15px 40px; 
-            font-size: 20px; 
-            background: #e91e63; 
-            color: white; 
-            border: none; 
-            border-radius: 50px; 
-            cursor: pointer; 
-            font-weight: bold;
-            box-shadow: 0px 4px 15px rgba(0,0,0,0.5);
-            text-transform: uppercase;
-        }
-
-        .instructions {
-            color: #ddd; margin-top: 20px; font-family: sans-serif; text-align: center;
-        }
-    </style>
-
     <script>
-        window.addEventListener('load', () => {
-            const video = document.querySelector('#vid');
-            const splash = document.querySelector('#splash-screen');
-            const button = document.querySelector('#start-button');
+        // 1. SLIDESHOW COMPONENT
+        AFRAME.registerComponent('slideshow', {
+            init: function() {
+                const el = this.el;
+                const images = [
+                    "https://placehold.co/400x300/orange/white?text=Slide+1", 
+                    "https://placehold.co/400x300/purple/white?text=Slide+2", 
+                    "https://placehold.co/400x300/green/white?text=Slide+3"
+                ];
+                let index = 0;
+                setInterval(() => {
+                    index = (index + 1) % images.length;
+                    el.setAttribute('src', images[index]);
+                }, 2000); // Change every 2 seconds
+            }
+        });
 
-            // 1. CLICK TO UNLOCK (Essential)
-            button.addEventListener('click', () => {
-                // We play it MUTED first to ensure the browser allows it
-                video.muted = true; 
-                video.play().then(() => {
-                    video.pause();         
-                    video.currentTime = 0; 
-                    splash.style.display = 'none'; // Hide splash
-                }).catch(e => {
-                    alert("Error unlocking video: " + e.message);
+        // 2. CLICKABLE LINK COMPONENT
+        AFRAME.registerComponent('social-link', {
+            schema: { url: {type: 'string'} },
+            init: function() {
+                this.el.addEventListener('click', () => {
+                    alert("Opening: " + this.data.url); // Alert for testing
+                    // window.open(this.data.url, '_blank'); // Uncomment this for real use
                 });
-            });
-
-            // 2. AR MARKER LOGIC
-            AFRAME.registerComponent('videohandler', {
-                init: function () {
-                    this.el.addEventListener('markerFound', () => {
-                        console.log("Marker Found - Attempting play");
-                        
-                        // FAILSAFE: Always start MUTED first. 
-                        // This guarantees the video will move.
-                        video.muted = true;
-                        video.play().then(() => {
-                            // If playing successfully, TRY to unmute
-                            video.muted = false;
-                        }).catch(e => {
-                            console.log("Autoplay blocked, keeping muted.");
-                        });
-                    });
-
-                    this.el.addEventListener('markerLost', () => {
-                        video.pause();
-                    });
-                }
-            });
+            }
         });
     </script>
 </head>
 
 <body style="margin: 0; overflow: hidden;">
 
-    <div id="splash-screen">
-        <button id="start-button">TAP TO START</button>
-        <div class="instructions">If video is silent, tap screen to unmute.</div>
+    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); color: white; display: flex; justify-content: center; align-items: center; z-index: 999;">
+        <div>Loading Placeholders...<br>Scan your image!</div>
     </div>
 
     <a-scene
         vr-mode-ui="enabled: false;"
         renderer="logarithmicDepthBuffer: true;"
         embedded
-        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
-
-        <a-assets>
-            <video 
-                id="vid" 
-                src="./my_video.mp4" 
-                preload="auto" 
-                loop 
-                playsinline 
-                webkit-playsinline>
-            </video>
-        </a-assets>
+        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
+        cursor="rayOrigin: mouse" 
+        raycaster="objects: .clickable">
 
         <a-nft
-            videohandler
             type="nft"
             url="https://Kav1nduAkalanka.github.io/AR_website/assests/nft"
             smooth="true"
             smoothCount="10"
             smoothTolerance="0.01"
             smoothThreshold="5">
-            
-            <a-video 
-                src="#vid" 
-                position="50 0 -50"
-                rotation="-90 0 90"
-                width="250" 
-                height="180">
-            </a-video>
+
+            <a-box 
+                color="blue"
+                position="-100 0 -150"
+                scale="50 50 50"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 4000">
+            </a-box>
+
+            <a-image
+                slideshow
+                src="https://placehold.co/400x300/orange/white?text=Loading..."
+                width="150" height="100"
+                position="150 0 -150"
+                rotation="-90 0 0">
+            </a-image>
+
+            <a-image 
+                src="https://placehold.co/100x100/3b5998/white?text=FB"
+                class="clickable"
+                social-link="url: Facebook"
+                width="40" height="40"
+                position="-120 0 150"
+                rotation="-90 0 0">
+            </a-image>
+
+            <a-image 
+                src="https://placehold.co/100x100/0077b5/white?text=LI"
+                class="clickable"
+                social-link="url: LinkedIn"
+                width="40" height="40"
+                position="-40 0 150"
+                rotation="-90 0 0">
+            </a-image>
+
+            <a-image 
+                src="https://placehold.co/100x100/333/white?text=GH"
+                class="clickable"
+                social-link="url: GitHub"
+                width="40" height="40"
+                position="40 0 150"
+                rotation="-90 0 0">
+            </a-image>
+
+            <a-image 
+                src="https://placehold.co/100x100/e91e63/white?text=WEB"
+                class="clickable"
+                social-link="url: Website"
+                width="40" height="40"
+                position="120 0 150"
+                rotation="-90 0 0">
+            </a-image>
+
         </a-nft>
 
         <a-entity camera></a-entity>
