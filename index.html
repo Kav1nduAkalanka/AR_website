@@ -9,7 +9,9 @@
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
     <script>
-        // 1. SLIDESHOW COMPONENT
+        // --- 1. REGISTER COMPONENTS IMMEDIATELY (Fixes Loader Issue) ---
+        
+        // Slideshow Logic
         AFRAME.registerComponent('slideshow', {
             init: function() {
                 const el = this.el;
@@ -26,7 +28,7 @@
             }
         });
 
-        // 2. CLICKABLE LINK COMPONENT
+        // Click Handler
         AFRAME.registerComponent('social-link', {
             schema: { url: {type: 'string'} },
             init: function() {
@@ -36,21 +38,18 @@
             }
         });
 
-        // 3. MAIN LOGIC (Hide Loader)
-        window.addEventListener('load', () => {
-            const loader = document.getElementById('loader');
-
-            AFRAME.registerComponent('markerhandler', {
-                init: function () {
-                    this.el.addEventListener('markerFound', () => {
-                        console.log("✅ Marker Found");
-                        loader.style.display = 'none'; // HIDE LOADING SCREEN
-                    });
-                    this.el.addEventListener('markerLost', () => {
-                        console.log("❌ Marker Lost");
-                    });
-                }
-            });
+        // Marker Handler (Hides Loader)
+        AFRAME.registerComponent('markerhandler', {
+            init: function () {
+                const loader = document.getElementById('loader');
+                this.el.addEventListener('markerFound', () => {
+                    console.log("✅ Marker Found");
+                    if(loader) loader.style.display = 'none'; // Force Hide
+                });
+                this.el.addEventListener('markerLost', () => {
+                    console.log("❌ Marker Lost");
+                });
+            }
         });
     </script>
 </head>
@@ -58,7 +57,7 @@
 <body style="margin: 0; overflow: hidden;">
 
     <div id="loader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 999;">
-        <div>Loading...</div>
+        <div>Loading Dashboard...</div>
         <div style="font-size: 12px; margin-top: 10px;">Point camera at image</div>
     </div>
 
@@ -95,10 +94,10 @@
             </a-image>
 
             <a-plane 
-                color="red" 
-                opacity="0.5" 
-                width="350" height="60" 
-                position="0 -1 80" 
+                color="green" 
+                opacity="0.3" 
+                width="300" height="100" 
+                position="0 -1 0" 
                 rotation="-90 0 0">
             </a-plane>
 
@@ -107,7 +106,7 @@
                 class="clickable"
                 social-link="url: Facebook"
                 width="40" height="40"
-                position="-120 0 80"
+                position="-120 1 0"
                 rotation="-90 0 0">
             </a-image>
 
@@ -116,7 +115,7 @@
                 class="clickable"
                 social-link="url: LinkedIn"
                 width="40" height="40"
-                position="-40 0 80"
+                position="-40 1 0"
                 rotation="-90 0 0">
             </a-image>
 
@@ -125,7 +124,7 @@
                 class="clickable"
                 social-link="url: GitHub"
                 width="40" height="40"
-                position="40 0 80"
+                position="40 1 0"
                 rotation="-90 0 0">
             </a-image>
 
@@ -134,7 +133,7 @@
                 class="clickable"
                 social-link="url: Website"
                 width="40" height="40"
-                position="120 0 80"
+                position="120 1 0"
                 rotation="-90 0 0">
             </a-image>
 
