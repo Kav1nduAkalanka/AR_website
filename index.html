@@ -3,20 +3,54 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AR Dashboard Stable</title>
+    <title>AR Dashboard HUD</title>
 
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe-master.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
     <style>
-        /* CHANGE 2: Ensure loader allows clicks to pass through */
+        /* 1. HUD CONTAINER: Fixed to bottom of screen */
+        #hud {
+            position: fixed; 
+            bottom: 20px; 
+            left: 0; 
+            width: 100%; 
+            display: flex; 
+            justify-content: center; 
+            gap: 20px; /* Space between buttons */
+            z-index: 1000; /* On top of everything */
+            display: none; /* Hidden until marker is found */
+        }
+
+        /* 2. THE BUTTONS: Standard HTML buttons (100% clickable) */
+        .hud-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%; /* Circle */
+            background-color: white;
+            border: 3px solid #e91e63;
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: transform 0.1s;
+            background-size: cover; /* Fit icon inside */
+        }
+
+        .hud-btn:active {
+            transform: scale(0.9); /* Press effect */
+            background-color: #ddd;
+        }
+
+        /* 3. LOADING SCREEN */
         #loader {
-            pointer-events: none; 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); color: white;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 9999;
         }
     </style>
 
     <script>
-        // Slideshow Logic
+        // SLIDESHOW LOGIC (Still needed for the AR part)
         AFRAME.registerComponent('slideshow', {
             init: function() {
                 const el = this.el;
@@ -33,53 +67,59 @@
             }
         });
 
-        // Click Logic
-        AFRAME.registerComponent('social-link', {
-            schema: { url: {type: 'string'} },
-            init: function() {
-                this.el.addEventListener('click', () => {
-                    // Visual feedback: flash red
-                    this.el.setAttribute('material', 'color', 'red'); 
-                    setTimeout(() => {
-                        this.el.setAttribute('material', 'color', 'white');
-                    }, 200);
-
-                    // Open link
-                    alert("Opening: " + this.data.url);
-                    // window.open(this.data.url, '_blank'); 
-                });
-            }
-        });
-
-        // Marker Handler
+        // MARKER LOGIC: Show/Hide HUD buttons
         AFRAME.registerComponent('markerhandler', {
             init: function () {
                 const loader = document.getElementById('loader');
+                const hud = document.getElementById('hud');
+
                 this.el.addEventListener('markerFound', () => {
-                    loader.style.opacity = "0";
+                    console.log("✅ Marker Found");
+                    loader.style.display = 'none'; // Hide Loader
+                    hud.style.display = 'flex';    // SHOW BUTTONS
                 });
+
                 this.el.addEventListener('markerLost', () => {
-                    // Optional: Show loader again if marker is lost
-                    // loader.style.opacity = "1";
+                    console.log("❌ Marker Lost");
+                    hud.style.display = 'none';    // Hide Buttons if marker lost
                 });
             }
         });
+
+        // CLICK FUNCTIONS (Called by the HTML buttons)
+        function openLink(url) {
+            alert("Opening: " + url);
+            // window.open(url, '_blank'); // Uncomment for real links
+        }
     </script>
 </head>
 
 <body style="margin: 0; overflow: hidden;">
 
-    <div id="loader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s;">
-        <div>Loading...</div>
+    <div id="loader">
+        <div>Loading Dashboard...</div>
+        <div style="font-size: 12px; margin-top: 10px;">Point camera at image</div>
+    </div>
+
+    <div id="hud">
+        <button class="hud-btn" onclick="openLink('Facebook')" 
+                style="background-image: url('https://placehold.co/60x60/3b5998/white?text=FB');"></button>
+        
+        <button class="hud-btn" onclick="openLink('LinkedIn')" 
+                style="background-image: url('https://placehold.co/60x60/0077b5/white?text=LI');"></button>
+        
+        <button class="hud-btn" onclick="openLink('GitHub')" 
+                style="background-image: url('https://placehold.co/60x60/333/white?text=GH');"></button>
+        
+        <button class="hud-btn" onclick="openLink('Website')" 
+                style="background-image: url('https://placehold.co/60x60/e91e63/white?text=WEB');"></button>
     </div>
 
     <a-scene
         vr-mode-ui="enabled: false;"
         renderer="logarithmicDepthBuffer: true;"
         embedded
-        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
-        cursor="rayOrigin: mouse"
-        raycaster="objects: .clickable">
+        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
 
         <a-nft
             markerhandler
@@ -105,26 +145,9 @@
                 rotation="-90 0 0">
             </a-image>
 
-            <a-entity position="-120 1 0" rotation="-90 0 0">
-                <a-plane class="clickable" social-link="url: Facebook" color="white" opacity="0.9" src="https://placehold.co/100x100/3b5998/white?text=FB" width="80" height="80"></a-plane>
-            </a-entity>
-
-            <a-entity position="-40 1 0" rotation="-90 0 0">
-                <a-plane class="clickable" social-link="url: LinkedIn" color="white" opacity="0.9" src="https://placehold.co/100x100/0077b5/white?text=LI" width="80" height="80"></a-plane>
-            </a-entity>
-
-            <a-entity position="40 1 0" rotation="-90 0 0">
-                <a-plane class="clickable" social-link="url: GitHub" color="white" opacity="0.9" src="https://placehold.co/100x100/333/white?text=GH" width="80" height="80"></a-plane>
-            </a-entity>
-
-            <a-entity position="120 1 0" rotation="-90 0 0">
-                <a-plane class="clickable" social-link="url: Website" color="white" opacity="0.9" src="https://placehold.co/100x100/e91e63/white?text=WEB" width="80" height="80"></a-plane>
-            </a-entity>
-
-        </a-nft>
+            </a-nft>
 
         <a-entity camera></a-entity>
-
     </a-scene>
 </body>
 </html>
